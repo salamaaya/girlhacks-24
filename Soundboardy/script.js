@@ -1,42 +1,74 @@
-window.onload = function() {
-    // Setup Paper.js
+window.onload = function() { 
     paper.setup('myCanvas');
 
-    // Create a basic circle to test
-    let circle = new paper.Path.Circle({
-        center: [100, 100],
-        radius: 50,
-        fillColor: 'red'
+    // Define the tile colors and layout
+    const tileColor = new paper.Color(0.8, 0.8, 0.8, 0); // Initially transparent (RGBA)
+    const tileClickColor = new paper.Color(0.5, 0.5, 0.5, 1); // Darker grey for click effect
+    const rows = 3;
+    const columns = 11;
+    const tileMargin = 10; // Margin between tiles
+
+    // Initialize Howler sound with your one sound file
+    const sound = new Howl({
+        src: ['sounds/PinkPanther30.wav']
     });
 
-    // Animate the circle
-    paper.view.onFrame = function(event) {
-        // Circle grows and shrinks over time
-        circle.scale(1 + Math.sin(event.time) * 0.005);
-    };
+    // Get the size of the canvas view
+    const viewWidth = paper.view.size.width;
+    const viewHeight = paper.view.size.height;
 
-    // Render the view
-    paper.view.draw();
+    // Calculate tile size based on canvas dimensions and margins
+    const tileWidth = (viewWidth - (columns + 1) * tileMargin) / columns;
+    const tileHeight = (viewHeight - (rows + 1) * tileMargin) / rows;
 
-    // Create a button
-    let button = new paper.Path.Rectangle({
-        point: [200, 100],
-        size: [100, 50],
-        fillColor: 'blue'
-    });
+    // Function to create a single tile
+    function createTile(x, y) {
+        // Create a rectangle path with initial fill color as fully transparent
+        const tile = new paper.Path.Rectangle({
+            point: [x, y],
+            size: [tileWidth, tileHeight],
+            fillColor: tileColor.clone(), // Use a clone to avoid reference issues
+            radius: 5 // Rounded corners
+        });
 
-    // Add a click event to play sound
-    button.onClick = function(event) {
-        let sound = document.getElementById('sound1');
-        sound.play();
-    };
+        // On press, animate the tile color and play sound
+        tile.onMouseDown = function() {
+            sound.play(); // Play sound on press
+            animatePressEffect(tile);
+        };
+    }
 
-    // Add an animation on click
-    button.onMouseDown = function(event) {
-        button.fillColor = 'green';
-    };
+    // Function to animate the press effect
+    function animatePressEffect(tile) {
+        // Set the tile color to the click color (fully opaque)
+        tile.fillColor = tileClickColor.clone();
 
-    button.onMouseUp = function(event) {
-        button.fillColor = 'blue';
-    };
+        // Create an animation to gradually fade back to transparency
+        const fadeDuration = 0.5; // duration in seconds
+        const startTime = paper.view.getFrameTime();
+
+        tile.onFrame = function(event) {
+            const elapsed = event.time - startTime;
+            const progress = elapsed / fadeDuration;
+
+            if (progress < 1) {
+                // Interpolate from the click color to transparent
+                tile.fillColor.alpha = 1 - progress;
+            } else {
+                // Ensure tile is fully transparent and stop the animation
+                tile.fillColor.alpha = 0;
+                tile.onFrame = null; // Stop the onFrame animation
+            }
+        };
+    }
+
+    // Create the grid of tiles
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < columns; col++) {
+            const x = tileMargin + col * (tileWidth + tileMargin);
+            const y = tileMargin + row * (tileHeight + tileMargin);
+            createTile(x, y);
+        }
+    }
+
 };
