@@ -2,6 +2,8 @@ window.onload = function() {
     // Setup Paper.js
     paper.setup('myCanvas');
 
+    let groupedColors = [];
+
     // Define the tile colors and layout
     const originalColor = new paper.Color(0.8, 0.8, 0.8, 1); // Light grey, fully opaque
     const clickAnimationColor = new paper.Color(0.5, 0.5, 0.5, 1); // Darker grey for animation
@@ -11,6 +13,10 @@ window.onload = function() {
     const submitButtonColor = new paper.Color(0.2, 0.4, 0.8, 1); // Blue color for submit button
     const stopButtonBorderColor = new paper.Color(0.7, 0.1, 0.1, 1); // Darker red for border
     const submitButtonBorderColor = new paper.Color(0.1, 0.3, 0.7, 1); // Darker blue for border
+    const groupButtonColor =  new paper.Color(1, 0.65, 0, 1);
+    const groupButtonBorderColor = new paper.Color(0.85, 0.55, 0, 1);
+    const refreshButtonColor = new paper.Color(0.56, 0, 1, 1);
+    const refreshButtonBorderColor = new paper.Color(0.4, 0, 0.8, 1);
     const successColor = new paper.Color(0.2, 0.8, 0.2, 1); // Bright green for correct tiles
     const revealColor = new paper.Color(0.8, 0.8, 0.2, 1); // Yellow color for revealing correct tiles
     const rows = 3;
@@ -311,7 +317,7 @@ window.onload = function() {
         const buttonY = viewHeight * 0.15; // Position the buttons at 15% of the view height
 
         // Calculate total width for three buttons including margins
-        const totalButtonsWidth = buttonWidth * 3 + 40; // 20px margin between buttons
+        const totalButtonsWidth = buttonWidth * 5 + 100; // 20px margin between buttons
 
         // Calculate starting X position to center buttons
         const startX = (viewWidth - totalButtonsWidth) / 2;
@@ -353,9 +359,23 @@ window.onload = function() {
             }
         });
 
+        //Create Group Button
+        const groupButtonGroup = createButton({
+            x: startX  + (buttonWidth + 20) * 2,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            color: groupButtonColor, // need color
+            borderColor:groupButtonBorderColor,
+            textContent: 'Group',
+            onClick: function() {
+                groupSelectedTiles(); // doesnt work 
+            }
+        }); 
+
         // Create Submit Button
         const submitButtonGroup = createButton({
-            x: startX + (buttonWidth + 20) * 2, // 20px margin
+            x: startX + (buttonWidth + 20) * 3, // 20px margin
             y: buttonY,
             width: buttonWidth,
             height: buttonHeight,
@@ -371,6 +391,20 @@ window.onload = function() {
 
                 // Check if the selected tiles are correct
                 checkUserSelection();
+            }
+        });
+
+        // Create Refresh Button
+        const refreshButtonGroup = createButton({
+            x: startX + (buttonWidth + 20) * 4, // 20px margin
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            color: refreshButtonColor,
+            borderColor: refreshButtonBorderColor,
+            textContent: 'Refresh',
+            onClick: function() {
+                refreshGame();
             }
         });
     }
@@ -512,6 +546,26 @@ window.onload = function() {
         });
     }
 
+    //Removable
+    function groupSelectedTiles() {
+        if (clickedTiles.length > 0) {
+            const newColor = new paper.Color(Math.random(), Math.random(), Math.random());
+            clickedTiles.forEach(tile => {
+                tile.fillColor = newColor; // Group color
+            });
+            groupedColors.push(newColor); // Track the color for future groups  
+        }
+    }
+
+    // Another removable
+    function refreshGame() {
+        if (attempts === 3) {
+            attempts = 0; // Reset attempts
+        }
+        clickedTiles.forEach(tile => tile.fillColor = 'lightgray'); // Reset colors
+        clickedTiles = []; // Clear selections
+    }
+
     // Function to check user's selection against the correct tiles
     function checkUserSelection() {
         // Get indices of selected tiles
@@ -603,4 +657,7 @@ window.onload = function() {
     }
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 25c60f1b75a7b3c0a571c50b827655be08771035
