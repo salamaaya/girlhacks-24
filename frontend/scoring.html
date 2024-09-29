@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Song Button Click Game</title>
+    <style>
+      button {
+        padding: 10px;
+        margin: 5px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Click the Buttons in the Correct Order!</h1>
+
+    <button id="button1">Snippet 1</button>
+    <button id="button2">Snippet 2</button>
+    <button id="button3">Snippet 3</button>
+    <button id="button4">Snippet 4</button>
+    <button id="button5">Snippet 5</button>
+    <button id="button6">Snippet 6</button>
+    <button id="button7">Snippet 7</button>
+    <button id="button8">Snippet 8</button>
+    <button id="button9">Snippet 9</button>
+    <button id="button10">Snippet 10</button>
+    <button id="button11">Snippet 11</button>
+    <button id="button12">Snippet 12</button>
+    <button id="button13">Snippet 13</button>
+    <button id="button14">Snippet 14</button>
+    <button id="button15">Snippet 15</button>
+    <button id="button16">Snippet 16</button>
+    <button id="button17">Snippet 17</button>
+    <button id="button18">Snippet 18</button>
+    <button id="button19">Snippet 19</button>
+    <button id="button20">Snippet 20</button>
+    <button id="button21">Snippet 21</button>
+    <button id="button22">Snippet 22</button>
+    <button id="button23">Snippet 23</button>
+    <button id="button24">Snippet 24</button>
+    <button id="button25">Snippet 25</button>
+
+
+    <h2 id="result"></h2>
+    <h2 id="score">Score: 0 </h2>
+
+    <audio id="audio1" src="snippet1.mp3"></audio>
+    <audio id="audio2" src="snippet2.mp3"></audio>
+    <audio id="audio3" src="snippet3.mp3"></audio>
+    <audio id="audio4" src="snippet4.mp3"></audio>
+    <audio id="audio5" src="snippet5.mp3"></audio>
+    <audio id="audio6" src="snippet6.mp3"></audio>
+    <audio id="audio7" src="snippet7.mp3"></audio>
+    <audio id="audio8" src="snippet8.mp3"></audio>
+    <audio id="audio9" src="snippet9.mp3"></audio>
+    <audio id="audio10" src="snippet10.mp3"></audio>
+    <audio id="audio11" src="snippet11.mp3"></audio>
+    <audio id="audio12" src="snippet12.mp3"></audio>
+    <audio id="audio13" src="snippet13.mp3"></audio>
+    <audio id="audio14" src="snippet14.mp3"></audio>
+    <audio id="audio15" src="snippet15.mp3"></audio>
+    <audio id="audio16" src="snippet16.mp3"></audio>
+    <audio id="audio17" src="snippet17.mp3"></audio>
+    <audio id="audio18" src="snippet18.mp3"></audio>
+    <audio id="audio19" src="snippet19.mp3"></audio>
+    <audio id="audio20" src="snippet20.mp3"></audio>
+    <audio id="audio21" src="snippet21.mp3"></audio>
+    <audio id="audio22" src="snippet22.mp3"></audio>
+    <audio id="audio23" src="snippet23.mp3"></audio>
+    <audio id="audio24" src="snippet24.mp3"></audio>
+    <audio id="audio25" src="snippet25.mp3"></audio>
+
+
+
+    <script>
+        const songOrders = {
+            1: [1, 2, 3, 4, 5],
+            2: [6, 7, 8, 9, 10],
+            3: [11, 12, 13, 14, 15],
+            4: [16, 17, 18, 19, 20],
+            5: [21, 22, 23, 24, 25],
+        };
+
+        let currentSong = Math.random() * (5 - 1) + 1;
+        let userClicks = [];
+        let score = 0;
+
+        function handleButtonClick(buttonNumber) {
+            document.getElementById('audio' + buttonNumber).play();
+            userClicks.push(buttonNumber);
+
+            if (userClicks.length === 5) {
+                let isCorrect = true;
+                for (let i = 0; i < userClicks.length; i++) {
+                    if (userClicks[i] !== songOrders[currentSong][i]) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+
+                if (isCorrect) {
+                    document.getElementById('result').innerText = "Congratulations! You got it right!";
+                    score++;
+                    document.getElementById('score').innerText = "Score: " + score; 
+                    userClicks = [];
+                    currentSong = null;
+                } else {
+                    document.getElementById('result').innerText = "Wrong order! Try again.";
+                    userClicks = []; 
+                }
+            }
+        }
+
+    </script>
+  </body>
+</html>

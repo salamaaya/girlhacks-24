@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Circles with Sound on Key Press</title>
+
+    <!-- Include Howler.js for sound -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.js"
+    ></script>
+
+    <!-- Include Paper.js library -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"
+    ></script>
+
+    <!-- PaperScript code -->
+    <script type="text/paperscript" canvas="myCanvas">
+      // Create the Howl sound object using the external audio file
+      var sound = new Howl({
+        src: ['https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'], // External sound URL
+        onload: function() {
+          console.log("Sound loaded successfully.");
+        },
+        onloaderror: function(id, err) {
+          console.error("Error loading sound:", err);
+        },
+        onplayerror: function(id, err) {
+          console.error("Error playing sound:", err);
+        }
+      });
+
+      var circles = [];
+
+      // Function called when a key is pressed
+      function onKeyDown(event) {
+        sound.stop(); // Stop the current sound before playing again
+        sound.play(); // Play the sound on each key press
+
+        // Generate random point within canvas
+        var MaxPoint = new Point(view.size.width, view.size.height);
+        var randomPoint = Point.random();
+        var point = MaxPoint.multiply(randomPoint);
+
+        // Create a new circle at the random point with a radius of 50
+        var newCircle = new Path.Circle(point, 50);
+        newCircle.fillColor = "orange";
+        circles.push(newCircle);
+      }
+
+      // Animation function that runs on each frame
+      function onFrame(event) {
+        for (var i = 0; i < circles.length; i++) {
+          circles[i].fillColor.hue += 1; // Gradually change the color
+          circles[i].scale(0.9); // Gradually reduce the size
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- Canvas element for Paper.js to draw the circles -->
+    <canvas id="myCanvas" resize></canvas>
+  </body>
+</html>
+
+
