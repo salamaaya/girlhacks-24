@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    score: {
+        type: Number,
+        required: false
+    },
 }, {
     timestamps: true
 });
