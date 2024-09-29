@@ -2,6 +2,8 @@ window.onload = function() {
     // Setup Paper.js
     paper.setup('myCanvas');
 
+    let groupedColors = [];
+
     // Define the tile colors and layout
     const originalColor = new paper.Color(0.8, 0.8, 0.8, 1); // Light grey, fully opaque
     const clickAnimationColor = new paper.Color(0.5, 0.5, 0.5, 1); // Darker grey for animation
@@ -11,6 +13,10 @@ window.onload = function() {
     const submitButtonColor = new paper.Color(0.2, 0.4, 0.8, 1); // Blue color for submit button
     const stopButtonBorderColor = new paper.Color(0.7, 0.1, 0.1, 1); // Darker red for border
     const submitButtonBorderColor = new paper.Color(0.1, 0.3, 0.7, 1); // Darker blue for border
+    const groupButtonColor =  new paper.Color(1, 0.65, 0, 1);
+    const groupButtonBorderColor = new paper.Color(0.85, 0.55, 0, 1);
+    const refreshButtonColor = new paper.Color(0.56, 0, 1, 1);
+    const refreshButtonBorderColor = new paper.Color(0.4, 0, 0.8, 1);
     const successColor = new paper.Color(0.2, 0.8, 0.2, 1); // Bright green for correct tiles
     const revealColor = new paper.Color(0.8, 0.8, 0.2, 1); // Yellow color for revealing correct tiles
     const rows = 3;
@@ -148,6 +154,26 @@ window.onload = function() {
         let lastClickTime = 0;
         let clickTimeout;
 
+        tile.onMouseEnter = function() {
+            // Stop playback sounds when a tile is clicked
+            stopAllPlaybackSounds();
+
+                // Single click behavior (without selection)
+                clickTimeout = setTimeout(() => {
+                    // Stop all preview sounds before playing a new one
+                    stopAllPreviewSounds();
+
+                    if (tile.sound) {
+                        // Play the sound and keep track of it
+                        const soundId = tile.sound.play();
+                        previewSoundsPlaying.push({ sound: tile.sound, id: soundId });
+                    }
+
+                    animatePressEffect(tile, originalColor, text); // Single click resets to original color
+                    tile.isAnimating = true; // Mark this tile as animating
+                });
+        };
+
         // On press, animate the tile color, update text, and play sound
         tile.onMouseDown = function() {
             if (gameWon) return; // Prevent interaction if game is won
@@ -167,29 +193,6 @@ window.onload = function() {
                 resetTile(tile);
                 return;
             }
-
-            // Handle single click or double click logic
-            if (timeSinceLastClick > doubleClickThreshold) {
-                // Single click behavior (without selection)
-                clickTimeout = setTimeout(() => {
-                    // Stop all preview sounds before playing a new one
-                    stopAllPreviewSounds();
-
-                    if (tile.sound) {
-                        // Play the sound and keep track of it
-                        const soundId = tile.sound.play();
-                        previewSoundsPlaying.push({ sound: tile.sound, id: soundId });
-                    }
-                    if (tile.isAnimating) {
-                        resetTile(tile);
-                    } else {
-                        animatePressEffect(tile, originalColor, text); // Single click resets to original color
-                        tile.isAnimating = true; // Mark this tile as animating
-                    }
-                }, doubleClickThreshold);
-            } else {
-                // Double-click behavior (select the tile and animate to resting color)
-                // Stop all preview sounds before playing
                 stopAllPreviewSounds();
 
                 if (tile.sound) {
@@ -200,30 +203,6 @@ window.onload = function() {
                 if (!tile.isSelected) {
                     selectTile();
                 }
-            }
-        };
-
-        tile.onMouseEnter = function() {
-            // Stop playback sounds when a tile is clicked
-            stopAllPlaybackSounds();
-
-                // Single click behavior (without selection)
-                clickTimeout = setTimeout(() => {
-                    // Stop all preview sounds before playing a new one
-                    stopAllPreviewSounds();
-
-                    if (tile.sound) {
-                        // Play the sound and keep track of it
-                        const soundId = tile.sound.play();
-                        previewSoundsPlaying.push({ sound: tile.sound, id: soundId });
-                    }
-                    if (tile.isAnimating) {
-                        resetTile(tile);
-                    } else {
-                        animatePressEffect(tile, originalColor, text); // Single click resets to original color
-                        tile.isAnimating = true; // Mark this tile as animating
-                    }
-                }, doubleClickThreshold);
         };
 
         // Function to select and animate tile to resting state
@@ -334,7 +313,7 @@ window.onload = function() {
         const buttonY = viewHeight * 0.15; // Position the buttons at 15% of the view height
 
         // Calculate total width for three buttons including margins
-        const totalButtonsWidth = buttonWidth * 3 + 40; // 20px margin between buttons
+        const totalButtonsWidth = buttonWidth * 5 + 100; // 20px margin between buttons
 
         // Calculate starting X position to center buttons
         const startX = (viewWidth - totalButtonsWidth) / 2;
@@ -376,9 +355,23 @@ window.onload = function() {
             }
         });
 
+        //Create Group Button
+        const groupButtonGroup = createButton({
+            x: startX  + (buttonWidth + 20) * 2,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            color: groupButtonColor, // need color
+            borderColor:groupButtonBorderColor,
+            textContent: 'Group',
+            onClick: function() {
+                groupSelectedTiles(); // doesnt work 
+            }
+        }); 
+
         // Create Submit Button
         const submitButtonGroup = createButton({
-            x: startX + (buttonWidth + 20) * 2, // 20px margin
+            x: startX + (buttonWidth + 20) * 3, // 20px margin
             y: buttonY,
             width: buttonWidth,
             height: buttonHeight,
@@ -396,6 +389,38 @@ window.onload = function() {
                 checkUserSelection();
             }
         });
+
+        // Create Refresh Button
+const refreshButtonGroup = createButton({
+    x: startX + (buttonWidth + 20) * 4, // 20px margin
+    y: buttonY,
+    width: buttonWidth,
+    height: buttonHeight,
+    color: refreshButtonColor,
+    borderColor: refreshButtonBorderColor,
+    textContent: 'Refresh',
+    onClick: function() {
+        // Reset the canvas
+        paper.project.clear(); // Clear everything drawn on the canvas
+
+        // Stop all sounds
+        stopAllPreviewSounds();
+        stopAllPlaybackSounds();
+
+        // Reset game variables
+        clickOrder = 1;
+        gameWon = false;
+        attempts = 0;
+        clickedTiles.length = 0;
+        previewSoundsPlaying.length = 0;
+        playbackSoundsPlaying.length = 0;
+
+        // Recreate tiles and buttons
+        createTiles();
+        createButtons();
+    }
+});
+
     }
 
     // Function to create a button
@@ -533,6 +558,26 @@ window.onload = function() {
                 playbackSoundsPlaying.push({ sound: tileData.tile.sound, id: soundId });
             }
         });
+    }
+
+    //Removable
+    function groupSelectedTiles() {
+        if (clickedTiles.length > 0) {
+            const newColor = new paper.Color(Math.random(), Math.random(), Math.random());
+            clickedTiles.forEach(tile => {
+                tile.fillColor = newColor; // Group color
+            });
+            groupedColors.push(newColor); // Track the color for future groups  
+        }
+    }
+
+    // Another removable
+    function refreshGame() {
+        if (attempts === 3) {
+            attempts = 0; // Reset attempts
+        }
+        clickedTiles.forEach(tile => tile.fillColor = 'lightgray'); // Reset colors
+        clickedTiles = []; // Clear selections
     }
 
     // Function to check user's selection against the correct tiles
