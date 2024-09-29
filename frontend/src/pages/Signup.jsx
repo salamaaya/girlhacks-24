@@ -2,8 +2,10 @@ import { Center, Container, VStack, Heading, Box, useColorModeValue, Button,
           InputGroup, Input, InputRightElement } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -46,6 +48,7 @@ const Signup = () => {
           status: "success",
           isClosable: true,
         });
+        navigate('/home');
       } else {
         toast({
           title: "Error",
