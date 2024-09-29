@@ -203,6 +203,29 @@ window.onload = function() {
             }
         };
 
+        tile.onMouseEnter = function() {
+            // Stop playback sounds when a tile is clicked
+            stopAllPlaybackSounds();
+
+                // Single click behavior (without selection)
+                clickTimeout = setTimeout(() => {
+                    // Stop all preview sounds before playing a new one
+                    stopAllPreviewSounds();
+
+                    if (tile.sound) {
+                        // Play the sound and keep track of it
+                        const soundId = tile.sound.play();
+                        previewSoundsPlaying.push({ sound: tile.sound, id: soundId });
+                    }
+                    if (tile.isAnimating) {
+                        resetTile(tile);
+                    } else {
+                        animatePressEffect(tile, originalColor, text); // Single click resets to original color
+                        tile.isAnimating = true; // Mark this tile as animating
+                    }
+                }, doubleClickThreshold);
+        };
+
         // Function to select and animate tile to resting state
         function selectTile() {
             text.content = clickOrder.toString(); // Set the text to the order of the click

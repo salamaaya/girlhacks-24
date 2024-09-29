@@ -34,7 +34,7 @@ const Home = () => {
 
   return (
     <div>
-      <canvas id="myCanvas" width="1200" height="400" resize="true" style={{ width: '100%', height: '100vh' }}></canvas>
+      <canvas id="myCanvas" width="1200" height="400" resize="true" style={{ width: '100%', height: '100vh' }} ></canvas>
       <audio id="sound1" src="sounds/PinkPanther30.wav"></audio>
     </div>
   );

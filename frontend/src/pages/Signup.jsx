@@ -48,7 +48,7 @@ const Signup = () => {
           status: "success",
           isClosable: true,
         });
-        navigate('/home');
+        asa('/home');
       } else {
         toast({
           title: "Error",
