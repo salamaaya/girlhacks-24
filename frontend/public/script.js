@@ -54,8 +54,9 @@ window.onload = function() {
         // Load sounds for the target song
         const targetSongSounds = targetSong.parts.map(file => new Howl({ src: ['sounds/' + file] }));
 
-        // Load the full song
-        const fullSong = new Howl({ src: ['sounds/' + targetSong.name + '/full.mp3'] });
+        // Corrected path for full song
+        const fullSong = new Howl({ src: [`/sounds/${targetSong.name}/full.mp3`] });
+
 
         // Collect snippets from other songs
         let otherSongs = songs.slice();
@@ -688,7 +689,9 @@ window.onload = function() {
             stopAllPlaybackSounds();
 
             // Play the full song
-            fullSong.play();
+            fullSong.once('load', () => {
+                fullSong.play();
+              });              
         }
 
         // Helper function to compare two arrays
