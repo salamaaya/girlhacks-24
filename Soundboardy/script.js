@@ -15,19 +15,22 @@ window.onload = function() {
     const clickedTiles = []; // Stack to track the order of clicked tiles
     const doubleClickThreshold = 300; // Threshold in milliseconds to detect double click
 
-    // Initialize Howler sound with your one sound file
-    let sound;
+    // List of sound files (update this array with your actual sound file names)
+    const soundFiles = [
+        'RPReplay_Final1727577039.mp3',
+        'RPReplay_Final1727577295.mp3',
+        'RPReplay_Final1727577533.mp3',
+        'RPReplay_Final1727577670.mp3',
+        'RPReplay_Final1727576820.mp3',
+        'RPReplay_Final1727576935.mp3',
+        // ... add more sound files as needed
+    ];
 
-    // Wait for a user click to enable sound
-    window.addEventListener('click', function() {
-        // If sound hasn't been initialized, initialize it
-        if (!sound) {
-            sound = new Howl({
-                src: ['sounds/PinkPanther30.wav']
-            });
-            console.log("Sound initialized after user interaction.");
-        }
-    });
+    // Load sounds into Howler.js
+    const sounds = soundFiles.map(file => new Howl({ src: ['sounds/' + file] }));
+
+    // Total number of tiles
+    const totalTiles = rows * columns;
 
     // Get the size of the canvas view
     const viewWidth = paper.view.size.width;
@@ -45,8 +48,11 @@ window.onload = function() {
         return new paper.Color(r, g, b, 1);
     }
 
+    // Array to hold all tiles
+    const allTiles = [];
+
     // Function to create a single tile
-    function createTile(x, y) {
+    function createTile(x, y, index) {
         // Each tile gets a unique resting color
         const tileRestingColor = getRandomRestingColor();
 
@@ -61,6 +67,13 @@ window.onload = function() {
         // Add per-tile state properties
         tile.isAnimating = false;
         tile.isSelected = false;
+
+        // Assign a sound to the tile if available
+        if (index < sounds.length) {
+            tile.sound = sounds[index];
+        } else {
+            tile.sound = null; // No sound assigned
+        }
 
         // Create a text item to show click order
         const text = new paper.PointText({
@@ -97,7 +110,9 @@ window.onload = function() {
             if (timeSinceLastClick > doubleClickThreshold) {
                 // Single click behavior (without selection)
                 clickTimeout = setTimeout(() => {
-                    if (sound) sound.play();
+                    if (tile.sound) {
+                        tile.sound.play();
+                    }
                     if (tile.isAnimating) {
                         resetTile(tile);
                     } else {
@@ -107,7 +122,9 @@ window.onload = function() {
                 }, doubleClickThreshold);
             } else {
                 // Double-click behavior (select the tile and animate to resting color)
-                if (sound) sound.play();
+                if (tile.sound) {
+                    tile.sound.play();
+                }
                 if (!tile.isSelected) {
                     selectTile();
                 }
@@ -211,6 +228,9 @@ window.onload = function() {
                 }
             };
         }
+
+        // Add tile to allTiles array
+        allTiles.push(tile);
     }
 
     function createPlayButton() {
@@ -275,11 +295,6 @@ window.onload = function() {
 
         // On click, animate with both scaling and color change
         playButtonGroup.onMouseDown = function() {
-            // Play sound if initialized
-            if (sound) {
-                sound.play();
-            }
-
             // Scale up the button and text for a pressing effect
             playButtonGroup.scale(1.1);
 
@@ -291,6 +306,9 @@ window.onload = function() {
                 playButtonGroup.scale(1 / 1.1);
                 playButtonRect.fillColor = playButtonColor;
             }, 100); // Return after 100ms
+
+            // Play sounds of selected tiles
+            playSelectedTileSounds();
         };
 
         // Bring the play button group to the front
@@ -308,6 +326,16 @@ window.onload = function() {
         });
     }
 
+    // Function to play sounds of selected tiles
+    function playSelectedTileSounds() {
+        // For all selected tiles, play their sounds simultaneously
+        clickedTiles.forEach(tileData => {
+            if (tileData.tile.sound) {
+                tileData.tile.sound.play();
+            }
+        });
+    }
+
     // Create the prompt above the play button
     createPrompt();
 
@@ -315,11 +343,13 @@ window.onload = function() {
     createPlayButton();
 
     // Create the grid of tiles (occupies 70% of view height)
+    let tileIndex = 0;
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < columns; col++) {
             const x = tileMargin + col * (tileWidth + tileMargin);
             const y = viewHeight * 0.3 + tileMargin + row * (tileHeight + tileMargin); // Start at 30% of view height
-            createTile(x, y);
+            createTile(x, y, tileIndex);
+            tileIndex++;
         }
     }
 };
