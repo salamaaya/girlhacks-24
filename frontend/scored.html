@@ -1,3 +1,4 @@
+// Please try to integrate the below logic into the above code. 
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -72,46 +73,76 @@
     <audio id="audio25" src="snippet25.mp3"></audio>
 
 
+<script>
+    const songOrders = {
+        1: [1, 2, 3, 4, 5],
+        2: [6, 7, 8, 9, 10],
+        3: [11, 12, 13, 14, 15],
+        4: [16, 17, 18, 19, 20],
+        5: [21, 22, 23, 24, 25],
+    };
 
-    <script>
-        const songOrders = {
-            1: [1, 2, 3, 4, 5],
-            2: [6, 7, 8, 9, 10],
-            3: [11, 12, 13, 14, 15],
-            4: [16, 17, 18, 19, 20],
-            5: [21, 22, 23, 24, 25],
-        };
+    let userGroups = [];
+    let currentGroup = [];
+    let score = 0;
+    let maxGroups = 5;
 
-        let currentSong = Math.random() * (5 - 1) + 1;
-        let userClicks = [];
-        let score = 0;
+    function handleButtonClick(buttonNumber) {
+        document.getElementById('audio' + buttonNumber).play();
+        currentGroup.push(buttonNumber);
+    }
 
-        function handleButtonClick(buttonNumber) {
-            document.getElementById('audio' + buttonNumber).play();
-            userClicks.push(buttonNumber);
+    document.getElementById('groupButton').addEventListener('click', function() {
+        if (currentGroup.length === 5) {
+            userGroups.push([...currentGroup]);
+            currentGroup = [];
+            document.getElementById('result').innerText = `Group ${userGroups.length} created!`;
+        } else {
+            document.getElementById('result').innerText = "A group must have 5 buttons!";
+        }
+    });
 
-            if (userClicks.length === 5) {
-                let isCorrect = true;
-                for (let i = 0; i < userClicks.length; i++) {
-                    if (userClicks[i] !== songOrders[currentSong][i]) {
-                        isCorrect = false;
-                        break;
-                    }
-                }
+   
+    function arraysMatch(arr1, arr2) {
+        if (arr1.length !== arr2.length) return false;
+        return arr1.every(val => arr2.includes(val));
+    }
 
-                if (isCorrect) {
-                    document.getElementById('result').innerText = "Congratulations! You got it right!";
-                    score++;
-                    document.getElementById('score').innerText = "Score: " + score; 
-                    userClicks = [];
-                    currentSong = null;
-                } else {
-                    document.getElementById('result').innerText = "Wrong order! Try again.";
-                    userClicks = []; 
+    document.getElementById('submitButton').addEventListener('click', function() {
+        if (userGroups.length === maxGroups) {
+            let correctGroups = 0;
+
+            for (let i = 0; i < maxGroups; i++) {
+                let group = userGroups[i];
+                let song = songOrders[i + 1];
+
+                if (arraysMatch(group, song)) {
+                    correctGroups++;
                 }
             }
-        }
 
-    </script>
-  </body>
+            if (correctGroups === maxGroups) {
+                document.getElementById('result').innerText = "Congratulations! All groups are correct!";
+                score++;
+            } else {
+                document.getElementById('result').innerText = `${correctGroups}/${maxGroups} groups are correct. Try again!`;
+            }
+
+            document.getElementById('score').innerText = "Score: " + score;
+            userGroups = [];
+        } else {
+            document.getElementById('result').innerText = "You must group all 5 songs before submitting!";
+        }
+    });
+
+    
+</script>
+</body>
 </html>
+
+
+
+
+
+
+
