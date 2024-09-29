@@ -32,5 +32,17 @@ const songs = [
             "staying_alive/RPReplay_Final1727574586.mp3",
             "staying_alive/RPReplay_Final1727574682.mp3"
         ]
+    },
+    {
+        "name": "ymca",
+        "parts": [
+            "ymca/RPReplay_Final1727586312.mp3",
+            "ymca/RPReplay_Final1727586409.mp3",
+            "ymca/RPReplay_Final1727586508.mp3",
+            "ymca/RPReplay_Final1727586777.mp3",
+            "ymca/RPReplay_Final1727586891.mp3",
+            "ymca/RPReplay_Final1727587017.mp3",
+            "ymca/RPReplay_Final1727587117.mp3"
+        ]
     }
 ];
